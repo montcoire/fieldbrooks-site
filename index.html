@@ -1,134 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fieldbrooks</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: #1a1a1a;
-      color: #f5f5f0;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    .logo {
-      position: fixed;
-      top: 32px;
-      left: 40px;
-      height: 28px;
-      z-index: 10;
-    }
-    .screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 120px 40px 80px;
-      transition: background 0.5s ease, color 0.5s ease;
-    }
-    .screen.home { background: #d8d8d4; color: #2a2a2a; }
-    .screen.commercial { background: #1f1f1f; color: #f5f5f0; }
-    .screen.resort { background: #2e2e2e; color: #f5f5f0; }
-    .tagline { font-size: 15px; letter-spacing: 0.04em; margin-bottom: 40px; opacity: 0.7; }
-    .paths, .cities { display: flex; gap: 40px; flex-wrap: wrap; }
-    .path, .city { cursor: pointer; transition: opacity 0.25s; }
-    .path:hover, .city:hover { opacity: 0.65; }
-    .path h2, .city h2 { font-size: 40px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 6px; }
-    .path p, .city p { font-size: 15px; opacity: 0.6; max-width: 200px; }
-    .reviews { margin-top: 56px; font-size: 14px; opacity: 0.5; }
-    .hidden { display: none; }
-    .back { margin-top: 48px; font-size: 14px; opacity: 0.5; cursor: pointer; }
-    .back:hover { opacity: 0.8; }
-    @media (max-width: 768px) {
-      .logo { left: 24px; top: 24px; }
-      .screen { padding: 100px 24px 60px; }
-      .paths, .cities { flex-direction: column; gap: 28px; }
-      .path h2, .city h2 { font-size: 34px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fieldbrooks — Built Around You</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Inter',-apple-system,system-ui,sans-serif;background:#111;color:#f5f5f0;overflow:hidden}
+.logo{position:fixed;top:28px;left:36px;height:26px;z-index:20;transition:opacity .4s}
+.progress{position:fixed;top:0;left:0;height:2px;background:#fff;z-index:21;width:0;transition:width .5s ease}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:100px 48px 60px;opacity:0;pointer-events:none;transition:opacity .45s ease,background .5s ease,color .5s ease;background:#111}
+.screen.active{opacity:1;pointer-events:auto}
+.screen.home{background:#e4e4e0;color:#1a1a1a}
+.screen.commercial{background:#161616;color:#f5f5f0}
+.screen.resort{background:#1c1c1c;color:#f5f5f0}
+.tagline{font-size:14px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-bottom:28px}
+.paths,.cities,.services{display:flex;gap:48px;flex-wrap:wrap;position:relative;z-index:1}
+.choice{cursor:pointer;transition:opacity .25s,transform .25s}
+.choice:hover{opacity:.7;transform:translateY(-2px)}
+.choice h2{font-size:44px;font-weight:300;letter-spacing:-.02em;margin-bottom:6px}
+.choice p{font-size:15px;opacity:.55;max-width:220px;line-height:1.4}
+.reviews{margin-top:52px;font-size:13px;opacity:.4;position:relative;z-index:1}
+.back{margin-top:44px;font-size:14px;opacity:.45;cursor:pointer;position:relative;z-index:1;width:fit-content}
+.back:hover{opacity:.8}
+.form{position:relative;z-index:1;max-width:420px;display:flex;flex-direction:column;gap:16px}
+.form input,.form textarea{background:transparent;border:none;border-bottom:1px solid currentColor;padding:10px 0;font:inherit;font-size:16px;color:inherit;outline:none}
+.form input::placeholder,.form textarea::placeholder{opacity:.35}
+.form textarea{resize:none;min-height:72px}
+.consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;opacity:.7;line-height:1.4}
+.consent input{margin-top:2px}
+.btn{margin-top:8px;background:currentColor;color:inherit;border:none;padding:14px 28px;font:inherit;font-size:14px;letter-spacing:.04em;cursor:pointer;width:fit-content;mix-blend-mode:difference}
+.confirm h2{font-size:40px;font-weight:300;margin-bottom:12px}
+.confirm p{font-size:16px;opacity:.7;max-width:360px;line-height:1.5}
+@media(max-width:760px){.logo{left:24px;top:22px}.screen{padding:90px 24px 40px}.paths,.cities,.services{flex-direction:column;gap:26px}.choice h2{font-size:34px}.btn{width:100%}}
+</style>
 </head>
 <body>
-  <img src="assets/fieldbrooks-logo-white.png" alt="Fieldbrooks" class="logo" id="logo">
-
-  <!-- Path selection -->
-  <section class="screen" id="pathScreen">
-    <div class="tagline">Built around you.</div>
-    <div class="paths">
-      <div class="path" data-path="home"><h2>Home</h2><p>Relief, everyday comfort.</p></div>
-      <div class="path" data-path="commercial"><h2>Commercial</h2><p>Confidence, control, progress.</p></div>
-      <div class="path" data-path="resort"><h2>Resort Living</h2><p>Desire, delight, belonging.</p></div>
-    </div>
-    <div class="reviews">80+ five-star reviews</div>
-  </section>
-
-  <!-- City selection -->
-  <section class="screen hidden" id="cityScreen">
-    <div class="tagline" id="cityTagline">Where?</div>
-    <div class="cities">
-      <div class="city" data-city="laredo"><h2>Laredo</h2><p>Primary</p></div>
-      <div class="city" data-city="san-antonio"><h2>San Antonio</h2><p>Primary</p></div>
-      <div class="city" data-city="austin"><h2>Austin</h2><p>Now serving</p></div>
-      <div class="city" data-city="dallas"><h2>Dallas</h2><p>Now serving</p></div>
-    </div>
-    <div class="back" id="backToPath">← Change path</div>
-  </section>
-
-  <!-- Next step placeholder -->
-  <section class="screen hidden" id="nextScreen">
-    <div class="tagline" id="nextTagline">What do you want?</div>
-    <p style="max-width: 360px; line-height: 1.5; opacity: 0.8;">Service menu and short form coming next. Path and city are locked.</p>
-    <div class="back" id="backToCity">← Change city</div>
-  </section>
-
-  <script>
-    const pathScreen = document.getElementById('pathScreen');
-    const cityScreen = document.getElementById('cityScreen');
-    const nextScreen = document.getElementById('nextScreen');
-    const logo = document.getElementById('logo');
-    let selectedPath = null;
-    let selectedCity = null;
-
-    function setTheme(path) {
-      document.body.className = path || '';
-      [pathScreen, cityScreen, nextScreen].forEach(s => s.className = 'screen');
-      if (path) {
-        pathScreen.classList.add(path);
-        cityScreen.classList.add(path);
-        nextScreen.classList.add(path);
-      }
-      logo.src = path === 'home' ? 'assets/fieldbrooks-logo-dark.png' : 'assets/fieldbrooks-logo-white.png';
-    }
-
-    document.querySelectorAll('.path').forEach(el => {
-      el.addEventListener('click', () => {
-        selectedPath = el.dataset.path;
-        setTheme(selectedPath);
-        pathScreen.classList.add('hidden');
-        cityScreen.classList.remove('hidden');
-      });
-    });
-
-    document.querySelectorAll('.city').forEach(el => {
-      el.addEventListener('click', () => {
-        selectedCity = el.dataset.city;
-        cityScreen.classList.add('hidden');
-        nextScreen.classList.remove('hidden');
-        document.getElementById('nextTagline').textContent = selectedPath + ' · ' + selectedCity;
-      });
-    });
-
-    document.getElementById('backToPath').addEventListener('click', () => {
-      cityScreen.classList.add('hidden');
-      pathScreen.classList.remove('hidden');
-      setTheme(null);
-    });
-
-    document.getElementById('backToCity').addEventListener('click', () => {
-      nextScreen.classList.add('hidden');
-      cityScreen.classList.remove('hidden');
-    });
-  </script>
+<img src="assets/logo-white.png" alt="Fieldbrooks" class="logo" id="logo">
+<div class="progress" id="progress"></div>
+<section class="screen active" id="s-path" data-step="1">
+  <div class="tagline">Built around you</div>
+  <div class="paths">
+    <div class="choice" data-path="home"><h2>Home</h2><p>Relief. Everyday comfort, done right.</p></div>
+    <div class="choice" data-path="commercial"><h2>Commercial</h2><p>Confidence. Control. Progress.</p></div>
+    <div class="choice" data-path="resort"><h2>Resort Living</h2><p>Desire. Delight. Belonging.</p></div>
+  </div>
+  <div class="reviews">Over a decade of work · 80+ five-star reviews</div>
+</section>
+<section class="screen" id="s-city" data-step="2">
+  <div class="tagline">Where?</div>
+  <div class="cities">
+    <div class="choice" data-city="Laredo"><h2>Laredo</h2><p>Primary</p></div>
+    <div class="choice" data-city="San Antonio"><h2>San Antonio</h2><p>Primary</p></div>
+    <div class="choice" data-city="Austin"><h2>Austin</h2><p>Now serving</p></div>
+    <div class="choice" data-city="Dallas"><h2>Dallas</h2><p>Now serving</p></div>
+  </div>
+  <div class="back" data-back="s-path">← Change path</div>
+</section>
+<section class="screen" id="s-menu" data-step="3">
+  <div class="tagline" id="menuTag"></div>
+  <div class="services" id="serviceList"></div>
+  <div class="back" data-back="s-city">← Change city</div>
+</section>
+<section class="screen" id="s-form" data-step="4">
+  <div class="tagline" id="formTag"></div>
+  <form class="form" id="leadForm" novalidate>
+    <input name="name" placeholder="Name" required>
+    <input name="email" type="email" placeholder="Email" required>
+    <input name="phone" type="tel" placeholder="Phone (optional)" id="phone">
+    <textarea name="notes" placeholder="Tell us a little about the project"></textarea>
+    <label class="consent" id="textConsent" style="display:none">
+      <input type="checkbox" name="textOk" id="textOk">
+      <span>You can text me about this project. Consent is not required to submit.</span>
+    </label>
+    <button class="btn" type="submit">Request a conversation</button>
+  </form>
+  <div class="back" data-back="s-menu">← Change service</div>
+</section>
+<section class="screen" id="s-done" data-step="5">
+  <div class="confirm"><h2>We’ll be in touch.</h2><p>Someone from Fieldbrooks will reach out shortly.</p></div>
+</section>
+<script>
+const state={path:null,city:null,service:null};
+const screens=document.querySelectorAll('.screen');
+const logo=document.getElementById('logo');
+const progress=document.getElementById('progress');
+const menus={home:[{id:'kitchen',title:'Kitchen',desc:'Full redesign and remodel'},{id:'bath',title:'Bath',desc:'From refresh to complete'},{id:'interior',title:'Whole Home',desc:'Broader interior work'},{id:'outdoor',title:'Outdoor Living',desc:'Decks, covers, comfort'}],commercial:[{id:'restaurant',title:'Restaurant',desc:'Front and back of house'},{id:'office',title:'Office',desc:'Professional environments'},{id:'retail',title:'Retail / Boutique',desc:'Spaces that sell'},{id:'plaza',title:'Plaza / Franchise',desc:'Smaller commercial builds'},{id:'pool',title:'Commercial Pool',desc:'Hospitality and outdoor'}],resort:[{id:'pool-luxury',title:'Custom Pool',desc:'Natural stone, full design'},{id:'pool-economic',title:'Pool, Simpler',desc:'Cool deck, standard plaster'},{id:'outdoor',title:'Outdoor Place',desc:'The full resort feeling'}]};
+const themes={home:{logo:'assets/logo-dark.png'},commercial:{logo:'assets/logo-white.png'},resort:{logo:'assets/logo-white.png'}};
+function go(id){screens.forEach(s=>s.classList.remove('active'));const n=document.getElementById(id);n.classList.add('active');progress.style.width=((+n.dataset.step-1)/4*100)+'%';}
+function applyTheme(path){screens.forEach(s=>{s.classList.remove('home','commercial','resort');if(path)s.classList.add(path);});logo.src=path?themes[path].logo:'assets/logo-white.png';}
+document.querySelectorAll('[data-path]').forEach(el=>el.addEventListener('click',()=>{state.path=el.dataset.path;applyTheme(state.path);go('s-city');}));
+document.querySelectorAll('[data-city]').forEach(el=>el.addEventListener('click',()=>{state.city=el.dataset.city;document.getElementById('menuTag').textContent=state.path+' · '+state.city;const list=document.getElementById('serviceList');list.innerHTML=menus[state.path].map(s=>`<div class="choice" data-service="${s.id}"><h2>${s.title}</h2><p>${s.desc}</p></div>`).join('');list.querySelectorAll('.choice').forEach(c=>c.addEventListener('click',()=>{state.service=c.dataset.service;document.getElementById('formTag').textContent=c.querySelector('h2').textContent;go('s-form');}));go('s-menu');}));
+document.querySelectorAll('[data-back]').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.back==='s-path'){state.path=null;applyTheme(null);}go(el.dataset.back);}));
+const phone=document.getElementById('phone');
+phone.addEventListener('input',()=>{document.getElementById('textConsent').style.display=phone.value.trim()?'flex':'none';});
+document.getElementById('leadForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;if(!f.name.value.trim()||!f.email.value.trim())return;if(phone.value.trim()&&!document.getElementById('textOk').checked){alert('If you add a phone number, please check the texting box — or leave the phone blank.');return;}console.log({path:state.path,city:state.city,service:state.service,name:f.name.value,email:f.email.value,phone:phone.value||null,textOk:document.getElementById('textOk').checked,notes:f.notes.value});go('s-done');});
+</script>
 </body>
 </html>
