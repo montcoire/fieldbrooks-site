@@ -20,94 +20,114 @@
       height: 28px;
       z-index: 10;
     }
-    .intro {
+    .screen {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       padding: 120px 40px 80px;
-      background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
-      transition: background 0.6s ease;
+      transition: background 0.5s ease, color 0.5s ease;
     }
-    .intro.home { background: linear-gradient(180deg, #d8d8d4 0%, #c8c8c4 100%); color: #2a2a2a; }
-    .intro.commercial { background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%); color: #f5f5f0; }
-    .intro.resort { background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%); color: #f5f5f0; }
-    .tagline {
-      font-size: 15px;
-      letter-spacing: 0.04em;
-      margin-bottom: 48px;
-      opacity: 0.7;
-    }
-    .paths {
-      display: flex;
-      gap: 48px;
-      flex-wrap: wrap;
-    }
-    .path {
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-    }
-    .path:hover { opacity: 0.7; }
-    .path h2 {
-      font-size: 42px;
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-    }
-    .path p {
-      font-size: 15px;
-      opacity: 0.6;
-      max-width: 220px;
-    }
-    .reviews {
-      margin-top: 64px;
-      font-size: 14px;
-      opacity: 0.5;
-      letter-spacing: 0.02em;
-    }
+    .screen.home { background: #d8d8d4; color: #2a2a2a; }
+    .screen.commercial { background: #1f1f1f; color: #f5f5f0; }
+    .screen.resort { background: #2e2e2e; color: #f5f5f0; }
+    .tagline { font-size: 15px; letter-spacing: 0.04em; margin-bottom: 40px; opacity: 0.7; }
+    .paths, .cities { display: flex; gap: 40px; flex-wrap: wrap; }
+    .path, .city { cursor: pointer; transition: opacity 0.25s; }
+    .path:hover, .city:hover { opacity: 0.65; }
+    .path h2, .city h2 { font-size: 40px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .path p, .city p { font-size: 15px; opacity: 0.6; max-width: 200px; }
+    .reviews { margin-top: 56px; font-size: 14px; opacity: 0.5; }
+    .hidden { display: none; }
+    .back { margin-top: 48px; font-size: 14px; opacity: 0.5; cursor: pointer; }
+    .back:hover { opacity: 0.8; }
     @media (max-width: 768px) {
       .logo { left: 24px; top: 24px; }
-      .intro { padding: 100px 24px 60px; }
-      .paths { flex-direction: column; gap: 32px; }
-      .path h2 { font-size: 36px; }
+      .screen { padding: 100px 24px 60px; }
+      .paths, .cities { flex-direction: column; gap: 28px; }
+      .path h2, .city h2 { font-size: 34px; }
     }
   </style>
 </head>
 <body>
   <img src="assets/fieldbrooks-logo-white.png" alt="Fieldbrooks" class="logo" id="logo">
 
-  <section class="intro" id="intro">
+  <!-- Path selection -->
+  <section class="screen" id="pathScreen">
     <div class="tagline">Built around you.</div>
     <div class="paths">
-      <div class="path" data-path="home">
-        <h2>Home</h2>
-        <p>Relief, everyday comfort.</p>
-      </div>
-      <div class="path" data-path="commercial">
-        <h2>Commercial</h2>
-        <p>Confidence, control, progress.</p>
-      </div>
-      <div class="path" data-path="resort">
-        <h2>Resort Living</h2>
-        <p>Desire, delight, belonging.</p>
-      </div>
+      <div class="path" data-path="home"><h2>Home</h2><p>Relief, everyday comfort.</p></div>
+      <div class="path" data-path="commercial"><h2>Commercial</h2><p>Confidence, control, progress.</p></div>
+      <div class="path" data-path="resort"><h2>Resort Living</h2><p>Desire, delight, belonging.</p></div>
     </div>
     <div class="reviews">80+ five-star reviews</div>
   </section>
 
+  <!-- City selection -->
+  <section class="screen hidden" id="cityScreen">
+    <div class="tagline" id="cityTagline">Where?</div>
+    <div class="cities">
+      <div class="city" data-city="laredo"><h2>Laredo</h2><p>Primary</p></div>
+      <div class="city" data-city="san-antonio"><h2>San Antonio</h2><p>Primary</p></div>
+      <div class="city" data-city="austin"><h2>Austin</h2><p>Now serving</p></div>
+      <div class="city" data-city="dallas"><h2>Dallas</h2><p>Now serving</p></div>
+    </div>
+    <div class="back" id="backToPath">← Change path</div>
+  </section>
+
+  <!-- Next step placeholder -->
+  <section class="screen hidden" id="nextScreen">
+    <div class="tagline" id="nextTagline">What do you want?</div>
+    <p style="max-width: 360px; line-height: 1.5; opacity: 0.8;">Service menu and short form coming next. Path and city are locked.</p>
+    <div class="back" id="backToCity">← Change city</div>
+  </section>
+
   <script>
-    const intro = document.getElementById('intro');
+    const pathScreen = document.getElementById('pathScreen');
+    const cityScreen = document.getElementById('cityScreen');
+    const nextScreen = document.getElementById('nextScreen');
     const logo = document.getElementById('logo');
+    let selectedPath = null;
+    let selectedCity = null;
+
+    function setTheme(path) {
+      document.body.className = path || '';
+      [pathScreen, cityScreen, nextScreen].forEach(s => s.className = 'screen');
+      if (path) {
+        pathScreen.classList.add(path);
+        cityScreen.classList.add(path);
+        nextScreen.classList.add(path);
+      }
+      logo.src = path === 'home' ? 'assets/fieldbrooks-logo-dark.png' : 'assets/fieldbrooks-logo-white.png';
+    }
+
     document.querySelectorAll('.path').forEach(el => {
       el.addEventListener('click', () => {
-        const path = el.dataset.path;
-        intro.className = 'intro ' + path;
-        logo.src = path === 'home' 
-          ? 'assets/fieldbrooks-logo-dark.png' 
-          : 'assets/fieldbrooks-logo-white.png';
-        // Placeholder: next step is city + menu
-        console.log('Path selected:', path);
+        selectedPath = el.dataset.path;
+        setTheme(selectedPath);
+        pathScreen.classList.add('hidden');
+        cityScreen.classList.remove('hidden');
       });
+    });
+
+    document.querySelectorAll('.city').forEach(el => {
+      el.addEventListener('click', () => {
+        selectedCity = el.dataset.city;
+        cityScreen.classList.add('hidden');
+        nextScreen.classList.remove('hidden');
+        document.getElementById('nextTagline').textContent = selectedPath + ' · ' + selectedCity;
+      });
+    });
+
+    document.getElementById('backToPath').addEventListener('click', () => {
+      cityScreen.classList.add('hidden');
+      pathScreen.classList.remove('hidden');
+      setTheme(null);
+    });
+
+    document.getElementById('backToCity').addEventListener('click', () => {
+      nextScreen.classList.add('hidden');
+      cityScreen.classList.remove('hidden');
     });
   </script>
 </body>
